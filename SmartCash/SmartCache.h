@@ -22,14 +22,13 @@ public:
 
 	std::shared_ptr<T> getPtr(ID id)
 	{
-		if (map[id].expired())
+		auto ptr = map[id].lock();
+		if (ptr==nullptr)
 		{
-			//load object
-			auto ptr = loader_(id);
-			map.at(id) = ptr;
-			return map.at(id).lock();
+			ptr = loader_(id);
+			map[id] = ptr;
 		}
-		return map.at(id).lock();
+		return ptr;
 	};
 };
 
