@@ -22,12 +22,7 @@ public:
 
 	std::shared_ptr<T> getPtr(ID id)
 	{
-		if (map.end() == map.find(id))
-		{
-			//create pointer
-			map.insert(std::make_pair(id, std::weak_ptr<T>()));
-		}
-		if (map.at(id).expired() == true)
+		if (map[id].expired())
 		{
 			//load object
 			auto ptr = loader_(id);
