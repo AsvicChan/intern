@@ -1,5 +1,5 @@
 #pragma once
-#include "stdafx.h"
+#include <memory>
 #include <unordered_map>
 
 template <class ID, class T> class SmartCache
