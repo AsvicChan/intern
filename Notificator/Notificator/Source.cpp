@@ -80,9 +80,9 @@ void testInfinity()
 int main()
 {
 	Notificator<std::string> notificator1(func, true);
-	//Notificator<std::string> notificato2(func, false);
-	//Notificator<std::string> notificato3(func, true);
-	//Notificator<std::string> notificato4(func, false);
+	Notificator<std::string> notificato2(func, false);
+	Notificator<std::string> notificato3(func, true);
+	Notificator<std::string> notificato4(func, false);
 	//testNormal();
 	//testEraseable();
 	//testThreads();
