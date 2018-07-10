@@ -1,25 +1,31 @@
 #pragma once
 #include <thread>
 #include <queue>
+#include <mutex>
 
-template <typename Message, typename Function>
+template <typename Message>
 class Notificator
 {
 private:
+	std::mutex mutex_;
 	std::queue<Message> queue_;
 	std::thread thread_;
 	bool eraseable_;
-	Function func_;
+	bool alive;
+	void(*func_)(Message);
 
-	void sender()
+	void send()
 	{
-		while (true)
+		alive = true;
+		while (alive)
 		{
-			if (queue_.empty != true)
+			mutex_.lock();
+			if (!queue_.empty())
 			{
 				func_(queue_.front());
 				queue_.pop();
 			}
+			mutex_.unlock();
 		}
 	};
 
@@ -27,17 +33,28 @@ public:
 
 	Notificator()
 	{
-		thread_(&Notificator.sender); //NOT YET READY DO NOT COMPILE
+		
+	};
+
+	template <typename F>
+	Notificator(F func, bool eraseable)
+	: thread_(&Notificator::send, this), func_(func), eraseable_(eraseable)
+	{
+
 	};
 
 	~Notificator()
 	{
-
+		alive = false;
+		thread_.join();
 	};
 
 	void notify(Message message)
 	{
-		queue_.push(m);
+		mutex_.lock();
+		if (eraseable_) queue_.pop();
+		queue_.push(message);
+		mutex_.unlock();
 	};
 
 };
