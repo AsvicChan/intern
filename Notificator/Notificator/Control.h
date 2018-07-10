@@ -1,8 +1,11 @@
 #pragma once
+#include "Worker.h"
 
 class Control
 {
 private:
+
+	Worker worker_;
 
 public:
 
@@ -12,6 +15,11 @@ public:
 	};
 
 	~Control()
+	{
+
+	};
+
+	void func()
 	{
 
 	};
