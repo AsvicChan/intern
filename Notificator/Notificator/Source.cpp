@@ -9,7 +9,7 @@ void func(std::string str)
 
 int main()
 {
-	Notificator<std::string> notificator(func,false);
+	Notificator<std::string> notificator(func,true);
 	notificator.notify("Message 1 ");
 	notificator.notify("Message 2 ");
 	notificator.notify("Message 3 ");

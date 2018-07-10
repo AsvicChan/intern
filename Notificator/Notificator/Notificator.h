@@ -52,7 +52,7 @@ public:
 	void notify(Message message)
 	{
 		mutex_.lock();
-		if (eraseable_) queue_.pop();
+		if (eraseable_ && !queue_.empty()) queue_.pop();
 		queue_.push(message);
 		mutex_.unlock();
 	};
