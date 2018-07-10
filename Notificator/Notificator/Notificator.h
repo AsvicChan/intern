@@ -11,13 +11,13 @@ private:
 	std::queue<Message> queue_;
 	std::thread thread_;
 	bool eraseable_;
-	bool alive;
+	bool alive_;
 	void(*func_)(Message);
 
 	void send()
 	{
-		alive = true;
-		while (alive)
+		alive_ = true;
+		while (alive_)
 		{
 			mutex_.lock();
 			if (!queue_.empty())
@@ -45,7 +45,7 @@ public:
 
 	~Notificator()
 	{
-		alive = false;
+		alive_ = false;
 		thread_.join();
 	};
 
