@@ -4,7 +4,7 @@
 #include <mutex>
 #include <condition_variable>
 
-template <typename Message>
+template <typename Message, typename Function>
 class Notificator
 {
 private:
@@ -15,7 +15,7 @@ private:
 	std::thread thread_;
 	const bool eraseable_;
 	bool needscall_;
-	void (*func_)(Message);
+	Function *f;
 
 	void send()
 	{
@@ -30,7 +30,7 @@ private:
 			}
 			while (!copyqueue.empty())
 			{
-				func_(copyqueue.front());
+				f(copyqueue.front());
 				copyqueue.pop();
 			}
 		}
@@ -43,9 +43,8 @@ public:
 		
 	};
 
-	template <typename F>
-	Notificator(F func, bool eraseable)
-	: alive_(true), thread_(&Notificator::send, this), func_(func), eraseable_(eraseable)
+	Notificator(Function func, bool eraseable)
+	: alive_(true), thread_(&Notificator::send, this), f(func), eraseable_(eraseable)
 	{
 
 	};
