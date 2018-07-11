@@ -14,8 +14,16 @@ private:
 	std::queue<Message> queue_;
 	std::thread thread_;
 	const bool eraseable_;
-	bool needscall_;
 	const Function *f;
+
+	void sendqueue(std::queue<Message> &queue)
+	{
+		while (!queue.empty())
+		{
+			f(std::move(queue.front()));
+			queue.pop();
+		}
+	};
 
 	void send()
 	{
@@ -24,21 +32,12 @@ private:
 			std::queue<Message> copyqueue;
 			{
 				std::unique_lock<std::mutex> lck(mutex_);
-				cv_.wait(lck, [this]() {return (needscall_ || !alive_); });
-				needscall_ = false;
-				if (!queue_.empty()) queue_.swap(copyqueue); 
+				cv_.wait(lck, [this]() {return (!queue_.empty() || !alive_); });
+				queue_.swap(copyqueue); 
 			}
-			while (!copyqueue.empty())
-			{
-				f(std::move(copyqueue.front()));
-				copyqueue.pop();
-			}
+			sendqueue(copyqueue);
 		}
-		while (!queue_.empty())
-		{
-			f(std::move(queue_.front()));
-			queue_.pop();
-		}
+		sendqueue(queue_);
 	};
 
 public:
@@ -66,7 +65,6 @@ public:
 		std::lock_guard<std::mutex> lock(mutex_);
 		if (eraseable_ && !queue_.empty()) queue_.pop();
 		queue_.push(message);
-		needscall_ = true;
 		cv_.notify_all();
 	};
 
