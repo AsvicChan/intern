@@ -26,15 +26,21 @@ private:
 			while (!needscall_) cv_.wait(lck);
 			if (!queue_.empty())
 			{
-				func_(queue_.front());
+				Message post = queue_.front();
 				queue_.pop();
+				lck.unlock();
+				func_(post);
+				lck.lock();
 			}
 			else needscall_ = false;
 		}
 		while (!queue_.empty())
 		{
-			func_(queue_.front());
+			Message post = queue_.front();
 			queue_.pop();
+			lck.unlock();
+			func_(post);
+			lck.lock();
 		}
 		return;
 	};
