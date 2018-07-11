@@ -8,41 +8,32 @@ template <typename Message>
 class Notificator
 {
 private:
+	bool alive_;
 	std::mutex mutex_;
 	std::condition_variable cv_;
 	std::queue<Message> queue_;
 	std::thread thread_;
-	bool eraseable_;
-	bool alive_;
+	const bool eraseable_;
 	bool needscall_;
-	void(*func_)(Message);
+	void (*func_)(Message);
 
 	void send()
 	{
-		alive_ = true;
-		std::unique_lock<std::mutex> lck(mutex_);
 		while (alive_)
 		{
-			while (!needscall_) cv_.wait(lck);
-			if (!queue_.empty())
+			std::queue<Message> copyqueue;
 			{
-				Message post = queue_.front();
-				queue_.pop();
-				lck.unlock();
-				func_(post);
-				lck.lock();
+				std::unique_lock<std::mutex> lck(mutex_);
+				while (!needscall_) cv_.wait(lck);
+				needscall_ = false;
+				if (!queue_.empty()) queue_.swap(copyqueue); 
 			}
-			else needscall_ = false;
+			while (!copyqueue.empty())
+			{
+				func_(copyqueue.front());
+				copyqueue.pop();
+			}
 		}
-		while (!queue_.empty())
-		{
-			Message post = queue_.front();
-			queue_.pop();
-			lck.unlock();
-			func_(post);
-			lck.lock();
-		}
-		return;
 	};
 
 public:
@@ -54,14 +45,13 @@ public:
 
 	template <typename F>
 	Notificator(F func, bool eraseable)
-	: thread_(&Notificator::send, this), func_(func), eraseable_(eraseable)
+	: alive_(true), thread_(&Notificator::send, this), func_(func), eraseable_(eraseable)
 	{
 
 	};
 
 	~Notificator()
 	{
-		//std::lock_guard<std::mutex> lock(mutex_);
 		alive_ = false;
 		needscall_ = true;
 		cv_.notify_all();
