@@ -24,7 +24,7 @@ private:
 			std::queue<Message> copyqueue;
 			{
 				std::unique_lock<std::mutex> lck(mutex_);
-				while (!needscall_) cv_.wait(lck);
+				cv_.wait(lck, [this]() {return (needscall_ || !alive_); });
 				needscall_ = false;
 				if (!queue_.empty()) queue_.swap(copyqueue); 
 			}
@@ -33,6 +33,11 @@ private:
 				f(copyqueue.front());
 				copyqueue.pop();
 			}
+		}
+		while (!queue_.empty())
+		{
+			f(queue_.front());
+			queue_.pop();
 		}
 	};
 
@@ -52,7 +57,6 @@ public:
 	~Notificator()
 	{
 		alive_ = false;
-		needscall_ = true;
 		cv_.notify_all();
 		thread_.join();
 	};
