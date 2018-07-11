@@ -1,6 +1,7 @@
 #include <iostream>
 #include "Notificator.h"
 #include <string>
+#include "Windows.h"
 
 void func(std::string str)
 {
@@ -36,6 +37,7 @@ void simpleCycle(int id, bool eraseable)
 	{
 		notificator.notify("Message "+std::to_string(i)+" from "+std::to_string(id)+"; ");
 	}
+	Sleep(3000);
 }
 
 void testThreads()
@@ -46,12 +48,12 @@ void testThreads()
 	std::thread t3(simpleCycle, 3, false);
 	std::thread t4(simpleCycle, 4, false);
 	std::thread t5(simpleCycle, 5, false);
-	std::cout << "Finished testThreads; ";
 	t1.detach();
 	t2.detach();
 	t3.detach();
 	t4.detach();
 	t5.detach();
+	std::cout << "Finished testThreads; ";
 }
 
 void infCycle(int id, bool eraseable)
@@ -70,10 +72,12 @@ void testInfinity()
 	std::thread t2(infCycle, 2, false);
 	std::thread t3(infCycle, 3, true);
 	std::thread t4(infCycle, 4, false);
+	std::thread t5(infCycle, 5, false);
 	t1.detach();
 	t2.detach();
 	t3.detach();
 	t4.detach();
+	t5.detach();
 	std::cout << "Finished testInfinity; ";
 }
 
