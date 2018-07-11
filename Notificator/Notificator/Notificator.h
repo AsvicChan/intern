@@ -15,7 +15,7 @@ private:
 	std::thread thread_;
 	const bool eraseable_;
 	bool needscall_;
-	Function *f;
+	const Function *f;
 
 	void send()
 	{
