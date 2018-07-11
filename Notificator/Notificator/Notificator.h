@@ -1,8 +1,8 @@
 #pragma once
+#include <condition_variable>
+#include <mutex>
 #include <thread>
 #include <queue>
-#include <mutex>
-#include <condition_variable>
 
 template <typename Message, typename Function>
 class Notificator
@@ -30,13 +30,13 @@ private:
 			}
 			while (!copyqueue.empty())
 			{
-				f(copyqueue.front());
+				f(std::move(copyqueue.front()));
 				copyqueue.pop();
 			}
 		}
 		while (!queue_.empty())
 		{
-			f(queue_.front());
+			f(std::move(queue_.front()));
 			queue_.pop();
 		}
 	};
