@@ -1,24 +1,24 @@
 #pragma once
 #include <algorithm>
 
-template <typename T, typename Filter>
-class DecComparator
+template <typename Obj, typename Filter>
+class DecoratorComparator
 {
 private:
 	Filter filter_;
 public:
 
-	DecComparator(Filter f) : filter_(f)
+	DecoratorComparator(Filter f) : filter_(f)
 	{
 
 	};
 
-	~DecComparator()
+	~DecoratorComparator()
 	{
 
 	};
 
-	bool operator()(T first, T second)
+	bool operator()(Obj first, Obj second)
 	{
 		if (filter_(first) && filter_(second)) return first < second;
 		if (filter_(first)) return true;
@@ -27,8 +27,8 @@ public:
 };
 
 template <class ForwardIt, typename Filter>
-ForwardIt mindecorator(ForwardIt first, ForwardIt last, Filter filter)
+ForwardIt min_element_if(ForwardIt first, ForwardIt last, Filter filter)
 {
-	DecComparator<decltype(*first),Filter> comparator(filter);
+	DecoratorComparator<decltype(*first),Filter> comparator(filter);
 	return std::min_element(first, last, comparator);
 };

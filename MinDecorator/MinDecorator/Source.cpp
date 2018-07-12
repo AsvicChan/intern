@@ -14,8 +14,7 @@ int main()
 	{
 		a[i] = i+1;
 	}
-	int n= *mindecorator(a, a + 8, filter);
-	std::cout << *mindecorator(a, a + 8, filter)<<std::endl;
+	std::cout << *min_element_if(a, a + 8, filter)<<std::endl;
 	system("pause");
 	return 0;
 }
